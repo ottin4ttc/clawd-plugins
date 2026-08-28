@@ -7,8 +7,8 @@
 ## 安装
 
 ```bash
-claude plugin marketplace add <this-repo>
-claude plugin install clawd-ops@clawd-plugins
+claude plugin marketplace add ottin4ttc/clawd-plugins
+claude plugin install clawd-ops@clawd
 ```
 
 ## 收录的 plugin
