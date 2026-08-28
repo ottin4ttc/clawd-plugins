@@ -21,7 +21,8 @@ daemon 每次启动会把 `clawd-rpc` MCP 挂进所有会话，它是 agent 调 
 
 ## 第二步：RPC 答不了，再 fetch 线上手册
 
-daemon 给所有会话注入了 `CLAWOS_API`（缺省 `https://api.clawos.chat`）。
+文档 base 取 env `CLAWOS_API`；**读不到就直接用 `https://api.clawos.chat`**——Claude Code
+会话由 daemon 注入这个 env，Codex 会话不一定有，但两者的目标地址是同一个，缺省值永远可用。
 
 先拉地图：`${CLAWOS_API}/api/docs/introspection/file-map.md` —— 讲 `~/.clawd/` 下每个文件是干啥的。
 

@@ -27,6 +27,31 @@ claude plugin install clawd-ops@clawd
 
 好处是 always-on context 极小，且知识可以随 clawd 演进而更新。
 
+
+## Claude Code 和 Codex 通用
+
+同一份 `marketplace.json`，两个引擎都认：
+
+```bash
+# Claude Code
+claude plugin marketplace add ottin4ttc/clawd-plugins
+claude plugin install clawd-ops@clawd
+
+# Codex
+codex plugin marketplace add ottin4ttc/clawd-plugins
+codex plugin add clawd-ops@clawd
+```
+
+两边是**独立的 cache**（`~/.claude/plugins/cache/` 和 `~/.codex/plugins/cache/`），
+升级时两边各装一次。
+
+依赖在两个引擎下的差异：
+
+| 依赖 | Claude Code | Codex |
+|---|---|---|
+| `clawd-rpc` MCP | daemon 注入 | daemon 注入（`-c mcp_servers.*`） |
+| `CLAWOS_API` env | daemon 注入 | 不一定有——skill 里写死了缺省 `https://api.clawos.chat` 兜底 |
+
 ## 结构
 
 ```

@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "clawd 生态的 Claude Code plugin 集合：让任意 persona / 任意项目都能操作本机 clawd daemon。",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "plugins": [
     {
       "name": "clawd-ops",
       "source": "./plugins/clawd-ops",
       "description": "全局 clawd 运维层：查本机 clawd 状态走 clawd-rpc MCP + 线上手册，跨设备派活/任务台账走自带脚本。执行与知识都不落地在 plugin 内，只做路由、护栏，以及 MCP 覆盖不到的三件事（跨设备调用、派活轮询、大结果裁剪）。",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "author": {
         "name": "David 梁默予"
       },
