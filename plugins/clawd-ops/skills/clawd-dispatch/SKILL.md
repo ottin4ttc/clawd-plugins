@@ -36,7 +36,7 @@ node $S/list-personas.mjs
 ```bash
 node $S/dispatch.mjs \
   --persona persona-clawd-helper \
-  --device owner-858868f9-de63-4e7a-a798-f3936e9a1bb9 \
+  --device owner-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
   --prompt "帮我看一下 xxx" \
   --wait 120
 ```
