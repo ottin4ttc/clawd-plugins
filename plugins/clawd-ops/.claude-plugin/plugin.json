@@ -1,8 +1,0 @@
-{
-  "name": "clawd-ops",
-  "version": "1.0.1",
-  "description": "全局 clawd 运维层：查本机 clawd 状态走 clawd-rpc MCP + 线上手册，跨设备派活/任务台账走自带脚本。执行与知识都不落地在本 plugin 内，只做路由、护栏和 MCP 覆盖不到的三件事。",
-  "author": {
-    "name": "David 梁默予"
-  }
-}
