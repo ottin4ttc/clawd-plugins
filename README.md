@@ -39,7 +39,7 @@ codex   plugin marketplace upgrade clawd && codex plugin add clawd-external-ops@
 ## clawd-external-ops
 
 **装它之前先确认你需要它**：clawd 内部的 persona 已经有 daemon 自动注入的
-`clawd-rpc` MCP 和 `clawd-dispatch` MCP，派活结果会自动回注会话——那条路比本 plugin
+`clawd-rpc` MCP 和  `clawd-external-dispatch` MCP，派活结果会自动回注会话——那条路比本 plugin
 的轮询脚本更直接。本 plugin 是给**没有 clawd 会话**的 agent 用的。
 
 两个 skill：
@@ -47,7 +47,7 @@ codex   plugin marketplace upgrade clawd && codex plugin add clawd-external-ops@
 | skill | 干什么 |
 |---|---|
 | `clawd` | 查 clawd 状态。纯路由：先走 `clawd-rpc` MCP → 答不了 fetch 线上手册 → 再按 file-map 读文件兜底。含安全护栏（不碰凭证、写操作先确认） |
-| `clawd-dispatch` | 跨设备给 persona 派活 + 任务台账，带 3 个脚本 |
+|  `clawd-external-dispatch` | 跨设备给 persona 派活 + 任务台账，带 3 个脚本 |
 
 ### 设计原则：不重复造 daemon 已有的东西
 

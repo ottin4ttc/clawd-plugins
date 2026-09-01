@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "clawd 生态的 plugin 集合。按「外部接入」和「clawd 自身组件」两类收录：external-ops 是给 clawd 之外的 agent 会话用的接入指引；将来 clawd 产品自己依赖的 MCP / skills / agents 也收进来，靠名字区分。",
-    "version": "1.1.0"
+    "version": "1.2.0"
   },
   "plugins": [
     {
       "name": "clawd-external-ops",
       "source": "./plugins/clawd-external-ops",
       "description": "**给 clawd 之外的 agent 会话用的接入指引**——让任意 Claude Code / Codex 会话能查 clawd 状态、跨设备给 persona 派活。查询走 daemon 注入的 clawd-rpc MCP + 线上手册，只有 MCP 覆盖不到的三件事（跨设备调用、派活轮询、大结果裁剪）才用自带脚本。clawd 内部的 persona 已有 daemon 注入的原生能力，不需要装它。",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "David 梁默予"
       },

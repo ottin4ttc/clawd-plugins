@@ -41,8 +41,8 @@ daemon 每次启动会把 `clawd-rpc` MCP 挂进所有会话，它是 agent 调 
 
 | 用户问的 | 去哪 |
 |---|---|
-| 派活给某人机器上的 persona / 我派的任务什么状态 | `clawd-dispatch` skill |
-| 联系人有谁 | `clawd-dispatch` 的 `list-personas.mjs`（**不要**调 `contact:list`，它返回带 `connectToken` 的完整记录） |
+| 派活给某人机器上的 persona / 我派的任务什么状态 | `clawd-external-dispatch` skill |
+| 联系人有谁 | `clawd-external-dispatch` 的 `list-personas.mjs`（**不要**调 `contact:list`，它返回带 `connectToken` 的完整记录） |
 
 ## 调之前先问用户
 

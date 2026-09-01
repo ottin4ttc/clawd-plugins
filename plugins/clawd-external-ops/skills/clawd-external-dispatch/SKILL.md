@@ -1,14 +1,18 @@
 ---
-name: clawd-dispatch
+name: clawd-external-dispatch
 description: 把任务派给 clawd 上联系人设备的 persona（「借来的」persona）并拿回结果，以及盘点派出去的任务台账。当用户说「让 XX persona 去做…」「派给某人机器上的 persona」「问问 XX 的 clawd 助手」「我派的任务怎么样了」「有什么在跑」「XX 那个任务好了没」，或要列出有哪些可派活的 persona 时使用。只覆盖派活 + 查结果这条链路，不做 clawd 的其它管理操作（那些走 clawd skill）。
 ---
 
 # 给 clawd persona 派活 & 查台账
 
+> 名字里的 external 是刻意的：daemon 自己有个同名的 `clawd-dispatch` MCP
+> （`mcp__clawd-dispatch__*`，给 clawd 内部 persona 用，结果自动回注会话）。
+> 本 skill 是给**没有 clawd 会话**的外部 agent 用的轮询版，两者不是一回事。
+
 用户本机跑着 clawd daemon，联系人设备上开放了一些 persona 给他用。这个 skill 把任务派
 过去、等对方干完、把结果拿回来，也负责盘点派过的所有任务。
 
-脚本都在 `${CLAUDE_PLUGIN_ROOT}/skills/clawd-dispatch/scripts/` 下，只用 node 内建模块。
+脚本都在 `${CLAUDE_PLUGIN_ROOT}/skills/clawd-external-dispatch/scripts/` 下，只用 node 内建模块。
 下面用 `$S` 指代这个目录。
 
 ## ⚠️ 能力边界：只能派给联系人设备上的 persona
