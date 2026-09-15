@@ -1,7 +1,7 @@
 {
   "name": "clawd",
-  "version": "0.1.0",
-  "description": "在 Codex 里直接用 clawd：登录一次，把做出来的东西分享出去。",
+  "version": "0.1.1",
+  "description": "在 Codex 里直接用 clawd：登录一次，把做出来的东西发成公网链接。链接任何人都能打开，别分享敏感文件。",
   "author": {
     "name": "clawd"
   },
@@ -16,7 +16,7 @@
   "interface": {
     "displayName": "clawd",
     "shortDescription": "登录 clawd，分享你做的东西",
-    "longDescription": "登录一次 clawd 账号（飞书扫码），之后在 Codex 里做出来的文件可以一句话变成别人能打开的链接。",
+    "longDescription": "登录一次 clawd 账号（飞书扫码），之后在 Codex 里做出来的文件可以一句话变成别人能打开的链接。链接是公开的：任何人拿到都能打开，没有访问控制——只用来分享 demo 页、演示稿这类可以公开的内容，禁止分享含密码、密钥、合同、个人信息的文件。",
     "developerName": "clawd",
     "category": "Productivity",
     "capabilities": [
