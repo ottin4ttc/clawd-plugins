@@ -1,7 +1,7 @@
 {
   "name": "clawd",
-  "version": "0.1.1",
-  "description": "在 Codex 里直接用 clawd：登录一次，把做出来的东西发成公网链接。链接任何人都能打开，别分享敏感文件。",
+  "version": "0.1.2",
+  "description": "在 Codex 里直接用 clawd：登录一次，把做出来的文件或文件夹发成链接。链接要飞书登录才能打开，公司内任何人登录后都能看。",
   "author": {
     "name": "clawd"
   },
@@ -16,7 +16,7 @@
   "interface": {
     "displayName": "clawd",
     "shortDescription": "登录 clawd，分享你做的东西",
-    "longDescription": "登录一次 clawd 账号（飞书扫码），之后在 Codex 里做出来的文件可以一句话变成别人能打开的链接。链接是公开的：任何人拿到都能打开，没有访问控制——只用来分享 demo 页、演示稿这类可以公开的内容，禁止分享含密码、密钥、合同、个人信息的文件。",
+    "longDescription": "登录一次 clawd 账号（飞书扫码），之后在 Codex 里做出来的文件或文件夹可以一句话变成链接。打开链接要飞书登录，公司内任何登录用户都能看——文件夹按静态站点展示（有 index.html 就是首页），md 渲染成页面。仍然不要分享含密码、密钥、合同、个人信息的内容。",
     "developerName": "clawd",
     "category": "Productivity",
     "capabilities": [
@@ -26,7 +26,7 @@
     "websiteURL": "https://clawos.chat",
     "defaultPrompt": [
       "把这个 html 分享出去",
-      "给我一个能发到群里的链接",
+      "把这个文件夹发成一个链接",
       "登录 clawd"
     ]
   }

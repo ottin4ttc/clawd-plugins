@@ -24533,9 +24533,8 @@ var LoginFlow = class {
     try {
       await this.deps.upsertBinding({
         deviceId: this.deps.getDeviceId(),
-        unionId: identity.unionId,
-        displayName: identity.displayName,
-        avatarUrl: identity.avatarUrl ?? null
+        ttcToken: params.token,
+        identity
       });
     } catch (err) {
       return {
@@ -24704,22 +24703,19 @@ async function upsertDeviceBinding(opts) {
   const doFetch = opts.fetchImpl ?? fetch;
   const ac = new AbortController();
   const timer = setTimeout(() => ac.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-  const body = { unionId: opts.unionId };
-  if (opts.avatarUrl != null) body.avatarUrl = opts.avatarUrl;
   let res;
   try {
-    res = await doFetch(`${opts.apiUrl}/api/device-bindings/self`, {
-      method: "PUT",
-      signal: ac.signal,
-      headers: {
-        authorization: `Bearer ${opts.apiKey}`,
-        "x-did": encodeURIComponent(opts.deviceId),
-        "x-name": encodeURIComponent(opts.displayName),
-        "x-scene": "daemon",
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(body)
-    });
+    res = await doFetch(
+      `${opts.apiUrl}/api/device-bindings/self?provider=${encodeURIComponent(opts.provider)}`,
+      {
+        method: "PUT",
+        signal: ac.signal,
+        headers: {
+          authorization: `Bearer ${opts.ttcToken}`,
+          "x-did": encodeURIComponent(opts.deviceId)
+        }
+      }
+    );
   } catch (err) {
     clearTimeout(timer);
     throw new DeviceBindingClientError(
@@ -24738,14 +24734,6 @@ async function upsertDeviceBinding(opts) {
     }
     throw new DeviceBindingClientError("API_ERROR", `HTTP ${res.status}: ${detail}`);
   }
-}
-
-// src/ticket/constants.ts
-var DEFAULT_CLAWD_TICKETS_API_KEY = "cf057f047674896978ddcc813adbc4a186551a6fcf59ad9d";
-function resolveClawdTicketsApiKey() {
-  const fromEnv = process.env.CLAWD_TICKETS_API_KEY;
-  if (fromEnv && fromEnv.length > 0) return fromEnv;
-  return DEFAULT_CLAWD_TICKETS_API_KEY;
 }
 
 // src/codex-plugin/login.ts
@@ -24774,8 +24762,9 @@ async function runCodexPluginLogin(deps = {}) {
     getDeviceId: () => authFile.deviceId,
     upsertBinding: (opts) => upsertDeviceBinding({
       apiUrl: clawosApi,
-      apiKey: deps.ticketsApiKey ?? resolveClawdTicketsApiKey(),
-      ...opts,
+      ttcToken: opts.ttcToken,
+      provider: opts.identity.provider,
+      deviceId: opts.deviceId,
       ...fetchImpl ? { fetchImpl } : {}
     }),
     now
@@ -24825,10 +24814,26 @@ var import_node_fs4 = __toESM(require("fs"), 1);
 var import_node_os3 = __toESM(require("os"), 1);
 var import_node_path5 = __toESM(require("path"), 1);
 var SHARE_MAX_BYTES = 50 * 1024 * 1024;
-var SHARE_WARNING = "\u94FE\u63A5\u4EFB\u4F55\u4EBA\u62FF\u5230\u90FD\u80FD\u6253\u5F00\uFF0C\u6CA1\u6709\u8BBF\u95EE\u63A7\u5236\u3002\u7981\u6B62\u5206\u4EAB\u542B\u5BC6\u7801\u3001\u5BC6\u94A5\u3001\u5408\u540C\u3001\u4E2A\u4EBA\u4FE1\u606F\u7B49\u654F\u611F\u5185\u5BB9\u7684\u6587\u4EF6\u3002";
+var SHARE_MAX_TOTAL_BYTES = 100 * 1024 * 1024;
+var SHARE_MAX_FILES = 500;
+var SHARE_WARNING = "\u94FE\u63A5\u9700\u8981\u98DE\u4E66\u767B\u5F55\u624D\u80FD\u6253\u5F00\uFF0C\u516C\u53F8\u5185\u4EFB\u4F55\u4EBA\u767B\u5F55\u540E\u90FD\u80FD\u770B\u3002\u4ECD\u7136\u4E0D\u8981\u5206\u4EAB\u542B\u5BC6\u7801\u3001\u5BC6\u94A5\u3001\u5408\u540C\u3001\u4E2A\u4EBA\u4FE1\u606F\u7B49\u654F\u611F\u5185\u5BB9\u7684\u6587\u4EF6\u3002";
 function looksSensitive(name) {
   const n = name.toLowerCase();
   return /^\.env(\.|$)/.test(n) || /^id_(rsa|dsa|ecdsa|ed25519)/.test(n) || /\.(pem|key|p12|pfx|kdbx)$/.test(n) || /^(auth|owner-identity|credentials?|secrets?|passwords?)\.(json|ya?ml|toml|txt)$/.test(n) || /^\.(npmrc|netrc|pypirc|git-credentials)$/.test(n);
+}
+function walkDir(root) {
+  const out = [];
+  const visit = (dir, rel) => {
+    for (const ent of import_node_fs4.default.readdirSync(dir, { withFileTypes: true })) {
+      if (ent.name.startsWith(".") || ent.name === "node_modules") continue;
+      const abs = import_node_path5.default.join(dir, ent.name);
+      const r = rel ? `${rel}/${ent.name}` : ent.name;
+      if (ent.isDirectory()) visit(abs, r);
+      else if (ent.isFile()) out.push({ relPath: r, abs, size: import_node_fs4.default.statSync(abs).size });
+    }
+  };
+  visit(root, "");
+  return out.sort((a, b) => a.relPath < b.relPath ? -1 : a.relPath > b.relPath ? 1 : 0);
 }
 async function runCodexPluginShare(filePath, deps = {}) {
   const dataDir = deps.dataDir ?? import_node_path5.default.join(import_node_os3.default.homedir(), ".clawd");
@@ -24844,12 +24849,34 @@ async function runCodexPluginShare(filePath, deps = {}) {
   } catch {
     return { status: "failed", reason: `\u6587\u4EF6\u4E0D\u5B58\u5728\uFF1A${filePath}` };
   }
-  if (!stat.isFile()) return { status: "failed", reason: `\u4E0D\u662F\u6587\u4EF6\uFF1A${filePath}` };
-  if (stat.size > SHARE_MAX_BYTES) return { status: "failed", reason: `\u6587\u4EF6\u8D85\u8FC7 ${SHARE_MAX_BYTES / 1024 / 1024} MB \u4E0A\u9650` };
   const name = import_node_path5.default.basename(filePath);
-  if (looksSensitive(name)) return { status: "failed", reason: `\u7591\u4F3C\u654F\u611F\u6587\u4EF6\uFF08\u51ED\u636E / \u5BC6\u94A5\uFF09\uFF0C\u4E0D\u4E0A\u4F20\uFF1A${name}` };
+  let kind;
+  let files;
+  if (stat.isDirectory()) {
+    kind = "dir";
+    files = walkDir(filePath);
+    if (files.length === 0) return { status: "failed", reason: `\u6587\u4EF6\u5939\u662F\u7A7A\u7684\uFF1A${filePath}` };
+    if (files.length > SHARE_MAX_FILES) return { status: "failed", reason: `\u6700\u591A ${SHARE_MAX_FILES} \u4E2A\u6587\u4EF6` };
+    const sensitive = files.filter((f) => looksSensitive(import_node_path5.default.posix.basename(f.relPath)));
+    if (sensitive.length > 0) {
+      return { status: "failed", reason: `\u6587\u4EF6\u5939\u91CC\u6709\u7591\u4F3C\u654F\u611F\u6587\u4EF6\uFF08\u51ED\u636E / \u5BC6\u94A5\uFF09\uFF0C\u6574\u4E2A\u4E0D\u4E0A\u4F20\uFF1A${sensitive.map((f) => f.relPath).join(", ")}` };
+    }
+    const tooBig = files.find((f) => f.size > SHARE_MAX_BYTES);
+    if (tooBig) return { status: "failed", reason: `${tooBig.relPath} \u8D85\u8FC7 ${SHARE_MAX_BYTES / 1024 / 1024} MB \u4E0A\u9650` };
+    const total = files.reduce((n, f) => n + f.size, 0);
+    if (total > SHARE_MAX_TOTAL_BYTES) return { status: "failed", reason: `\u6587\u4EF6\u5939\u603B\u91CF\u8D85\u8FC7 ${SHARE_MAX_TOTAL_BYTES / 1024 / 1024} MB \u4E0A\u9650` };
+  } else if (stat.isFile()) {
+    kind = "file";
+    if (looksSensitive(name)) return { status: "failed", reason: `\u7591\u4F3C\u654F\u611F\u6587\u4EF6\uFF08\u51ED\u636E / \u5BC6\u94A5\uFF09\uFF0C\u4E0D\u4E0A\u4F20\uFF1A${name}` };
+    if (stat.size > SHARE_MAX_BYTES) return { status: "failed", reason: `\u6587\u4EF6\u8D85\u8FC7 ${SHARE_MAX_BYTES / 1024 / 1024} MB \u4E0A\u9650` };
+    files = [{ relPath: name, abs: filePath, size: stat.size }];
+  } else {
+    return { status: "failed", reason: `\u4E0D\u662F\u6587\u4EF6\u6216\u6587\u4EF6\u5939\uFF1A${filePath}` };
+  }
   const form = new FormData();
-  form.append("file", new Blob([import_node_fs4.default.readFileSync(filePath)]), name);
+  form.append("kind", kind);
+  form.append("name", name);
+  for (const f of files) form.append("file", new Blob([import_node_fs4.default.readFileSync(f.abs)]), f.relPath);
   let res;
   try {
     res = await fetchImpl(`${clawosApi}/api/shares?provider=${encodeURIComponent(record2.identity.provider)}`, {
@@ -24875,7 +24902,8 @@ async function runCodexPluginShare(filePath, deps = {}) {
     return { status: "failed", reason };
   }
   const { id, url } = await res.json();
-  return { status: "ok", id, url, name, size: stat.size, warning: SHARE_WARNING };
+  const size = files.reduce((n, f) => n + f.size, 0);
+  return { status: "ok", id, url, name, size, kind, fileCount: files.length, warning: SHARE_WARNING };
 }
 
 // src/codex-plugin/mcp-server.ts
@@ -24902,7 +24930,7 @@ async function handleShareCall(filePath, deps = {}) {
   const r = await (deps.share ?? runCodexPluginShare)(filePath);
   switch (r.status) {
     case "ok":
-      return { content: [{ type: "text", text: JSON.stringify({ url: r.url, name: r.name, size: r.size, warning: r.warning }) }] };
+      return { content: [{ type: "text", text: JSON.stringify({ url: r.url, name: r.name, kind: r.kind, fileCount: r.fileCount, size: r.size, warning: r.warning }) }] };
     case "login_required":
       return { content: [{ type: "text", text: JSON.stringify({ status: "login_required", hint: "\u5148\u8C03 login \u767B\u5F55\uFF0C\u518D\u8C03 share_file" }) }] };
     case "failed":
@@ -24910,7 +24938,7 @@ async function handleShareCall(filePath, deps = {}) {
   }
 }
 function createCodexPluginServer(deps = {}) {
-  const server = new McpServer({ name: "clawd", version: "0.1.1" });
+  const server = new McpServer({ name: "clawd", version: "0.1.2" });
   server.registerTool(
     "login",
     {
@@ -24923,9 +24951,9 @@ function createCodexPluginServer(deps = {}) {
   server.registerTool(
     "share_file",
     {
-      title: "\u628A\u6587\u4EF6\u53D1\u5E03\u4E3A\u516C\u7F51\u94FE\u63A5\u2014\u2014\u4EFB\u4F55\u4EBA\u62FF\u5230\u94FE\u63A5\u90FD\u80FD\u6253\u5F00\uFF0C\u7981\u6B62\u5206\u4EAB\u654F\u611F\u6587\u4EF6",
-      description: 'Upload a local file and get a PUBLIC URL: anyone with the link can open it, no access control, permanent. Before calling, tell the user this in one sentence and make sure the file is not sensitive (passwords, keys, contracts, personal data). Files that look like credentials are refused. path must be absolute. Returns { status: "login_required" } when not logged in \u2014 call login, then call this again. Warning to relay to the user after success: ' + SHARE_WARNING,
-      inputSchema: { path: external_exports.string().describe("absolute path of the file") }
+      title: "\u628A\u6587\u4EF6\u6216\u6587\u4EF6\u5939\u53D1\u5E03\u6210\u94FE\u63A5\u2014\u2014\u516C\u53F8\u5185\u4EFB\u4F55\u4EBA\u98DE\u4E66\u767B\u5F55\u540E\u90FD\u80FD\u770B\uFF0C\u7981\u6B62\u5206\u4EAB\u654F\u611F\u5185\u5BB9",
+      description: 'Upload a local file or folder and get a URL that requires Feishu (TTC) login to open: anyone in the company who logs in can view it, permanent. A folder is served as a static site (index.html is the home page; otherwise a file listing); .md renders as a page. Before calling, tell the user this in one sentence and make sure the content is not sensitive (passwords, keys, contracts, personal data). Files that look like credentials are refused; folders skip dot-files and node_modules. path must be absolute. Returns { status: "login_required" } when not logged in \u2014 call login, then call this again. Warning to relay to the user after success: ' + SHARE_WARNING,
+      inputSchema: { path: external_exports.string().describe("absolute path of the file or folder") }
     },
     async ({ path: path6 }) => handleShareCall(path6, deps)
   );

@@ -12,8 +12,7 @@
       "CODEX_MCP_NODE_PATH",
       "CODEX_ELECTRON_RESOURCES_PATH",
       "CODEX_CLI_PATH",
-      "CLAWOS_API",
-      "CLAWD_TICKETS_API_KEY"
+      "CLAWOS_API"
     ],
     "startup_timeout_sec": 10,
     "tool_timeout_sec": 600,
