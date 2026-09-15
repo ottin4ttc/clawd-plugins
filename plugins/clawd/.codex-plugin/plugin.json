@@ -1,0 +1,33 @@
+{
+  "name": "clawd",
+  "version": "0.1.0",
+  "description": "在 Codex 里直接用 clawd：登录一次，把做出来的东西分享出去。",
+  "author": {
+    "name": "clawd"
+  },
+  "homepage": "https://clawos.chat",
+  "keywords": [
+    "clawd",
+    "share",
+    "login"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "clawd",
+    "shortDescription": "登录 clawd，分享你做的东西",
+    "longDescription": "登录一次 clawd 账号（飞书扫码），之后在 Codex 里做出来的文件可以一句话变成别人能打开的链接。",
+    "developerName": "clawd",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://clawos.chat",
+    "defaultPrompt": [
+      "把这个 html 分享出去",
+      "给我一个能发到群里的链接",
+      "登录 clawd"
+    ]
+  }
+}

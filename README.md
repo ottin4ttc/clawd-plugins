@@ -8,6 +8,7 @@
 |---|---|---|---|
 | **外部接入** | `clawd-external-*` | clawd **之外**的 agent 会话（你在某个项目里开的 CC / Codex） | `clawd-external-ops` |
 | **clawd 自身组件** | 待定 | clawd 产品自己依赖的 MCP / skills / agents | — |
+| **面向用户** | `clawd` | 只用 Codex app 的业务用户 | `clawd` |
 
 分类的依据是**依赖方向**：
 
@@ -78,3 +79,19 @@ plugins/<name>/
 
 然后在 `.claude-plugin/marketplace.json` 的 `plugins` 数组加一条
 `{"name": "...", "source": "./plugins/..."}`，按上面的分类给名字加前缀。
+
+## clawd
+
+给只用 Codex app 的业务用户：登录一次 clawd 账号（飞书扫码，与 clawd 桌面端共用 `~/.clawd/owner-identity.json`），之后一句话把本地文件变成公网链接。
+
+```bash
+codex plugin marketplace add https://github.com/ottin4ttc/clawd-plugins.git
+codex plugin add clawd@clawd
+```
+
+| tool | 干什么 |
+|---|---|
+| `login` | 登录 clawd 账号 |
+| `share_file` | 本地文件 → 公网链接（Codex 弹一次审批） |
+
+**这里只放产物**：源码在 clawos monorepo `clawd/daemon/src/codex-plugin/`，`pnpm build:codex-plugin` 出单文件 `mcp-server.cjs`（复用 daemon 的登录代码，运行时只要 node——Codex 自带），`scripts/publish-codex-plugin.mjs --to <本仓库>` 同步过来。改功能去改 monorepo，不要在这里改。

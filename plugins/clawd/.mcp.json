@@ -1,0 +1,27 @@
+{
+  "clawd": {
+    "command": "./scripts/launch",
+    "args": [
+      "./mcp-server.cjs"
+    ],
+    "cwd": ".",
+    "env_vars": [
+      "HOME",
+      "PATH",
+      "XDG_CACHE_HOME",
+      "CODEX_MCP_NODE_PATH",
+      "CODEX_ELECTRON_RESOURCES_PATH",
+      "CODEX_CLI_PATH",
+      "CLAWOS_API",
+      "CLAWD_TICKETS_API_KEY"
+    ],
+    "startup_timeout_sec": 10,
+    "tool_timeout_sec": 600,
+    "default_tools_approval_mode": "approve",
+    "tools": {
+      "share_file": {
+        "approval_mode": "prompt"
+      }
+    }
+  }
+}

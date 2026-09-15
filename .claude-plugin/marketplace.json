@@ -4,8 +4,8 @@
     "name": "David 梁默予"
   },
   "metadata": {
-    "description": "clawd 生态的 plugin 集合。按「外部接入」和「clawd 自身组件」两类收录：external-ops 是给 clawd 之外的 agent 会话用的接入指引；将来 clawd 产品自己依赖的 MCP / skills / agents 也收进来，靠名字区分。",
-    "version": "1.2.0"
+    "description": "clawd 生态的 plugin 集合。external-ops 是给 clawd 之外的 agent 会话用的接入指引（开发者）；clawd 是给只用 Codex app 的业务用户：登录 clawd 账号，把本地文件变成公网链接。源码在 clawos monorepo（clawd/daemon/src/codex-plugin），这里只放产物。",
+    "version": "1.3.0"
   },
   "plugins": [
     {
@@ -23,6 +23,21 @@
         "dispatch",
         "rpc",
         "daemon"
+      ],
+      "category": "productivity"
+    },
+    {
+      "name": "clawd",
+      "source": "./plugins/clawd",
+      "description": "登录 clawd 账号（飞书扫码），把本地文件变成任何人都能打开的链接。给只用 Codex app 的业务用户。",
+      "version": "0.1.0",
+      "author": {
+        "name": "clawd"
+      },
+      "keywords": [
+        "clawd",
+        "share",
+        "login"
       ],
       "category": "productivity"
     }
