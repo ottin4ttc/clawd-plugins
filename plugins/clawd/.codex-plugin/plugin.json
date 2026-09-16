@@ -1,6 +1,6 @@
 {
   "name": "clawd",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "在 Codex 里直接用 clawd：登录一次，把做出来的文件或文件夹发成链接。链接要飞书登录才能打开，公司内任何人登录后都能看。",
   "author": {
     "name": "clawd"

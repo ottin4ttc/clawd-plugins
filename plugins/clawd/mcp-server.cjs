@@ -3227,8 +3227,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path6) {
-      let input = path6;
+    function removeDotSegments(path7) {
+      let input = path7;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -3480,8 +3480,8 @@ var require_schemes = __commonJS({
         wsComponent.secure = void 0;
       }
       if (wsComponent.resourceName) {
-        const [path6, query] = wsComponent.resourceName.split("?");
-        wsComponent.path = path6 && path6 !== "/" ? path6 : void 0;
+        const [path7, query] = wsComponent.resourceName.split("?");
+        wsComponent.path = path7 && path7 !== "/" ? path7 : void 0;
         wsComponent.query = query;
         wsComponent.resourceName = void 0;
       }
@@ -6874,12 +6874,12 @@ var require_dist = __commonJS({
         throw new Error(`Unknown format "${name}"`);
       return f;
     };
-    function addFormats(ajv, list, fs5, exportName) {
+    function addFormats(ajv, list, fs6, exportName) {
       var _a;
       var _b;
       (_a = (_b = ajv.opts.code).formats) !== null && _a !== void 0 ? _a : _b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`;
       for (const f of list)
-        ajv.addFormat(f, fs5[f]);
+        ajv.addFormat(f, fs6[f]);
     }
     module2.exports = exports2 = formatsPlugin;
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -6890,11 +6890,15 @@ var require_dist = __commonJS({
 // src/codex-plugin/mcp-server.ts
 var mcp_server_exports = {};
 __export(mcp_server_exports, {
+  DEV_VERSION: () => DEV_VERSION,
   createCodexPluginServer: () => createCodexPluginServer,
   handleLoginCall: () => handleLoginCall,
-  handleShareCall: () => handleShareCall
+  handleShareCall: () => handleShareCall,
+  pluginVersion: () => pluginVersion
 });
 module.exports = __toCommonJS(mcp_server_exports);
+var import_node_fs5 = __toESM(require("fs"), 1);
+var import_node_path6 = __toESM(require("path"), 1);
 
 // ../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/external.js
 var external_exports = {};
@@ -7374,8 +7378,8 @@ function getErrorMap() {
 
 // ../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path: path6, errorMaps, issueData } = params;
-  const fullPath = [...path6, ...issueData.path || []];
+  const { data, path: path7, errorMaps, issueData } = params;
+  const fullPath = [...path7, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -7491,11 +7495,11 @@ var errorUtil;
 
 // ../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path6, key) {
+  constructor(parent, value, path7, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path6;
+    this._path = path7;
     this._key = key;
   }
   get path() {
@@ -11132,10 +11136,10 @@ function assignProp(target, prop, value) {
     configurable: true
   });
 }
-function getElementAtPath(obj, path6) {
-  if (!path6)
+function getElementAtPath(obj, path7) {
+  if (!path7)
     return obj;
-  return path6.reduce((acc, key) => acc?.[key], obj);
+  return path7.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -11455,11 +11459,11 @@ function aborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path6, issues) {
+function prefixIssues(path7, issues) {
   return issues.map((iss) => {
     var _a;
     (_a = iss).path ?? (_a.path = []);
-    iss.path.unshift(path6);
+    iss.path.unshift(path7);
     return iss;
   });
 }
@@ -21465,8 +21469,8 @@ var DeployScanSchema = external_exports.object({
   /** 扫描时被告知的共享资产名单（判「扫描器后来长了新本事」用） */
   scannedAssets: external_exports.array(external_exports.string()).default([]),
   /**
-   * 这次扫描是**对哪个 commit 的断言**。`deploy:start` 在起扫描之前会先把 persona 目录
-   * 提交并推上去，所以这个值一定是仓库里真实存在的一版。
+   * 这次扫描是**对哪个 commit 的断言**。`deploy:release` 在起扫描之前会先把 persona 目录
+   * 提交（只提交不推，推是发布末尾那一下的事），所以这个值一定是仓库里真实存在的一版。
    *
    * 有了它，「清单过没过时」才是个可判定的等式（`head === repo.head`），
    * 而不是从 `dirty` / `ahead` 里猜——那两个字段判不出「清单是好几版之前扫的」。
@@ -21485,8 +21489,8 @@ var DeployScanSchema = external_exports.object({
    */
   releasedHead: external_exports.string().min(1).optional(),
   /**
-   * 这次**实际**怎么扫的。是结果不是入参——`deploy:start` 收到的 mode 可能因为没有可比的
-   * 基准而退成硬扫，页面要显示的是真正发生的那个。
+   * 这次**实际**怎么扫的。档位由 daemon 定（有线上版本可比 + 有跑完的清单 → 软扫，否则硬扫），
+   * 页面要显示的是真正发生的那个。
    *
    * `.default('hard')` 而不是必填：这个文件是 strict 解析的，存量记录没有这个字段，
    * 定成必填会让 `readScan` 当场抛、上云页面直接打不开。而老记录确实都是从零扫的。
@@ -21561,19 +21565,16 @@ var DeployStateSchema = external_exports.object({
    */
   fileError: external_exports.string().optional()
 }).strict();
-var DeployReleaseResultSchema = external_exports.object({
-  sha: external_exports.string().min(1),
-  actionsUrl: external_exports.string().min(1)
-}).strict();
+var DeployReleaseResultSchema = external_exports.discriminatedUnion("outcome", [
+  external_exports.object({
+    outcome: external_exports.literal("pushed"),
+    sha: external_exports.string().min(1),
+    actionsUrl: external_exports.string().min(1)
+  }).strict(),
+  external_exports.object({ outcome: external_exports.literal("scanning") }).strict()
+]);
 var DeployPersonaArgsSchema = external_exports.object({
   personaId: external_exports.string().min(1)
-}).strict();
-var DeployStartArgsSchema = DeployPersonaArgsSchema.extend({
-  /**
-   * 缺省 soft。真正用哪一档由 daemon 定（软扫比不了时会退硬扫），结果看 `DeployScan.baseKind`。
-   * 复用上面那个中央定义的字面量，不在这里手抄一份。
-   */
-  mode: ScanBaseKindSchema.optional()
 }).strict();
 var DeployPatchArgsSchema = external_exports.object({
   personaId: external_exports.string().min(1),
@@ -21815,13 +21816,7 @@ var AuthGetIdentityResponseSchema = external_exports.object({
    * 设备属性，与登录态无关、登录登出不变。UI"我的设备标识"用它拼
    * clawos://device/<deviceId>（替代旧的 unionId——不再向外暴露人的身份标识）。
    */
-  deviceId: external_exports.string().min(1),
-  /**
-   * TTC JWT 过期时间（unix ms）。null = 登录回调未携带 expires_at；字段缺省 = 老 daemon。
-   * 仅时间戳——token 本体永不出 ws（spec §9 不变）。UI 据此派生 过期/临期 提示
-   * （见 spec 2026-08-17-ttc-jwt-expiry-ux-design §2）。
-   */
-  ttcTokenExpiresAt: external_exports.number().nullable().optional()
+  deviceId: external_exports.string().min(1)
 });
 var AuthLogoutResponseSchema = external_exports.object({
   type: external_exports.literal("auth:logout:ok")
@@ -21841,6 +21836,11 @@ var AuthApiKeyRegenerateResponseSchema = external_exports.object({
   apiKey: external_exports.string().min(1),
   createdAt: external_exports.string().min(1),
   gatewayUrl: GatewayUrl
+});
+var AuthApiKeyRevokeResponseSchema = external_exports.object({
+  type: external_exports.literal("auth:apiKey:revoke:ok"),
+  /** 之前有没有那把——没发过也算成功（幂等） */
+  revoked: external_exports.boolean()
 });
 var AuthLoginDoneEventSchema = external_exports.object({
   type: external_exports.literal("auth:login:done"),
@@ -23955,10 +23955,6 @@ var METHOD_DOCS = {
     args: WorkspaceReadArgs
   },
   // ---- deploy:*（persona 上云：persona 目录 = git 仓库工作树，发布 = 推送触发仓库流水线）----
-  "deploy:start": {
-    summary: "\u5BF9\u67D0\u4E2A persona \u8D77\u4E00\u6B21\u4E0A\u4E91\u626B\u63CF\u3002**\u6CA1\u4ED3\u5E93\u5148\u5EFA\u4ED3**\uFF08GitHub REST \u5EFA\u5728\u7EC4\u7EC7\u4E0B\u3001\u79C1\u6709\uFF0Cgit \u63A8\u9996\u4E2A\u63D0\u4EA4\uFF1Btoken \u6765\u81EA\u672C\u673A git \u7684\u8EAB\u4EFD\uFF0C\u6CA1\u6388\u6743\u5148\u62D2\uFF09\uFF0C\u518D\u8D77 persona-butler \u7684\u626B\u63CF\u4F1A\u8BDD\uFF0C\u7ED3\u679C\u5199\u8FDB persona \u76EE\u5F55\u7684 .clawd/deploy.json \uFF08\u73AF\u5883\u6E05\u5355\uFF0C\u8FDB\u4ED3\u5E93\uFF09\u4E0E .clawd/deploy-scan.json\uFF08\u8BC1\u636E\uFF0C\u4E0D\u8FDB\u4ED3\u5E93\uFF09\u3002\u5DF2\u7ECF\u5728\u626B\u7684\u8BDD\u539F\u6837\u8FD4\u56DE\u3001\u4E0D\u8D77\u7B2C\u4E8C\u4E2A\u626B\u63CF\u4F1A\u8BDD\uFF1Bowner-only",
-    args: DeployPersonaArgsSchema
-  },
   "deploy:get": {
     summary: "\u4E0A\u4E91\u9875\u9762\u8981\u7684\u5168\u90E8\uFF1A\u4ED3\u5E93\u7ED1\u5B9A\u72B6\u6001\uFF08git \u73B0\u7B97\uFF09\u3001\u90E8\u7F72\u6587\u4EF6\u3001\u626B\u63CF\u8BB0\u5F55\u3001\u4ED3\u5E93 Secrets \u91CC\u5404\u53D8\u91CF\u540D\u586B\u8FC7\u6CA1\u6709\uFF08**\u53EA\u6709\u540D\u5B57\u548C\u65F6\u95F4\uFF0C\u6CA1\u6709\u503C**\uFF09\uFF1Bowner-only",
     args: DeployPersonaArgsSchema
@@ -23980,7 +23976,7 @@ var METHOD_DOCS = {
     args: DeployFinishScanArgsSchema
   },
   "deploy:release": {
-    summary: "\u53D1\u5E03 = \u63D0\u4EA4\u5E76\u63A8\u9001\u5230\u4ED3\u5E93\uFF1A\u91CD\u5199 workflow \u6A21\u677F \u2192 git add -A \u2192 \u7A7A\u63D0\u4EA4\u4E5F\u5141\u8BB8 \u2192 push\u3002\u4ED3\u5E93\u91CC\u7684\u6D41\u6C34\u7EBF\u63A5\u7740\u6784\u955C\u50CF\u3001\u5728\u96C6\u7FA4\u4E0A\u771F\u8D77\u4E00\u6B21\u3001\u767B\u8BB0\u6210\u6B63\u5F0F\uFF0C\u8FDB\u5EA6\u5728 GitHub Actions \u770B\u3002\u524D\u7F6E\uFF1A\u5DF2\u7ED1\u5B9A\u4ED3\u5E93\u3001\u6709\u6E05\u5355\u3001\u6BCF\u4E2A\u53D8\u91CF\u540D\u90FD\u5728 Secrets \u91CC\uFF1Bowner-only",
+    summary: "\u53D1\u5E03\u2014\u2014\u4E0A\u4E91\u552F\u4E00\u7684\u52A8\u4F5C\uFF0C\u626B\u63CF\u662F\u5B83\u7684\u7B2C\u4E00\u6BB5\u3002**\u6CA1\u4ED3\u5E93\u5148\u5EFA\u4ED3**\uFF08GitHub REST \u5EFA\u5728\u7EC4\u7EC7\u4E0B\u3001\u79C1\u6709\uFF0Cgit \u63A8\u9996\u4E2A\u63D0\u4EA4\uFF1Btoken \u6765\u81EA\u672C\u673A git \u7684\u8EAB\u4EFD\uFF0C\u6CA1\u6388\u6743\u5148\u62D2\uFF09\u3002\u6E05\u5355\u8FC7\u65F6\uFF08persona \u6539\u8FC7 / \u6CA1\u626B\u8FC7 / \u4E0A\u6B21\u626B\u5931\u8D25\uFF09\uFF1A\u5148\u628A persona \u76EE\u5F55\u63D0\u4EA4\u5230\u672C\u5730\uFF08\u4E0D\u63A8\uFF09\uFF0C\u8D77 persona-butler \u7684\u626B\u63CF\u4F1A\u8BDD\uFF0C\u56DE outcome=scanning\u2014\u2014\u7ED3\u679C\u5199\u8FDB .clawd/deploy.json\uFF08\u6E05\u5355\uFF0C\u8FDB\u4ED3\u5E93\uFF09\u4E0E .clawd/deploy-scan.json\uFF08\u8BC1\u636E\uFF0C\u4E0D\u8FDB\u4ED3\u5E93\uFF09\uFF0C\u6B63\u5728\u626B\u7684\u8BDD\u539F\u6837\u8FD4\u56DE\u4E0D\u8D77\u7B2C\u4E8C\u4E2A\u4F1A\u8BDD\u3002\u6E05\u5355\u65B0\u9C9C\uFF1A\u8FC7\u95F8\uFF08\u6BCF\u4E2A\u53D8\u91CF\u540D\u90FD\u5728 Secrets \u91CC\u3001\u8FDE\u63A5\u5668\u6765\u6E90\u70B9\u8FC7\u3001\u9009\u4E86\u6A21\u578B\uFF09\u2192 \u91CD\u5199 workflow \u6A21\u677F \u2192 git add -A \u2192 \u7A7A\u63D0\u4EA4\u4E5F\u5141\u8BB8 \u2192 push\uFF0C\u56DE outcome=pushed \u5E26 commit \u4E0E Actions \u5730\u5740\uFF1B\u4ED3\u5E93\u91CC\u7684\u6D41\u6C34\u7EBF\u63A5\u7740\u6784\u955C\u50CF\u3001\u8BD5\u8DD1\u3001\u767B\u8BB0\u3002owner-only",
     args: DeployPersonaArgsSchema
   },
   "deploy:rerunJob": {
@@ -24378,7 +24374,7 @@ var METHOD_DOCS = {
     args: NO_ARGS
   },
   "auth:getIdentity": {
-    summary: "\u53D6\u672C\u673A owner \u7684\u98DE\u4E66\u8EAB\u4EFD\uFF08ownerId / provider / displayName / unionId\uFF09+ **\u672C\u673A deviceId**\uFF08\u8BBE\u5907\u5C5E\u6027\uFF0C\u4E0E\u767B\u5F55\u6001\u65E0\u5173\uFF1Bdevice:connect / contact:* / inbox:* \u7684\u4E3B\u952E\u90FD\u662F\u5B83\uFF09\uFF1B\u7EDD\u4E0D\u8FD4\u56DE ttcToken",
+    summary: "\u53D6\u672C\u673A owner \u7684\u98DE\u4E66\u8EAB\u4EFD\uFF08ownerId / provider / displayName / unionId\uFF09+ **\u672C\u673A deviceId**\uFF08\u8BBE\u5907\u5C5E\u6027\uFF0C\u4E0E\u767B\u5F55\u6001\u65E0\u5173\uFF1Bdevice:connect / contact:* / inbox:* \u7684\u4E3B\u952E\u90FD\u662F\u5B83\uFF09\uFF1B\u7EDD\u4E0D\u8FD4\u56DE\u767B\u5F55\u7968",
     args: NO_ARGS
   },
   "auth:logout": {
@@ -24391,6 +24387,10 @@ var METHOD_DOCS = {
   },
   "auth:apiKey:regenerate": {
     summary: "\u6362\u4E00\u628A\u65B0\u7684\u4E91 persona \u8C03\u7528 key\uFF0C**\u65E7\u7684\u5F53\u573A\u5931\u6548**\uFF08\u4E00\u4EBA\u4E00\u628A\uFF0C\u4E2D\u5FC3\u6309 union_id \u8986\u76D6\uFF09\u3002owner-only",
+    args: NO_ARGS
+  },
+  "auth:apiKey:revoke": {
+    summary: "\u64A4\u9500\u81EA\u5DF1\u7684\u4E91 persona \u8C03\u7528 key\uFF1A\u4E2D\u5FC3\u5220\u6389\u90A3\u4E00\u884C\u3001**\u4E0D\u53D1\u65B0\u7684**\u3002gateway \u53EA\u5728\u5F00\u4F1A\u8BDD\u548C\u6BCF\u6B21\u4E0A\u884C\u65F6\u9A8C key\uFF0C\u6240\u4EE5\u5F00\u7740\u7684\u4E91\u4F1A\u8BDD\u4E0B\u4E00\u6761\u6D88\u606F\u624D\u53D1\u4E0D\u51FA\u53BB\u3001\u6B63\u5728\u8DD1\u7684\u90A3\u4E00\u8F6E\u4F1A\u8DD1\u5B8C\u3002\u6CA1\u53D1\u8FC7\u4E5F\u56DE ok\uFF08revoked:false\uFF09\u3002owner-only",
     args: NO_ARGS
   },
   "device:list": {
@@ -24530,23 +24530,23 @@ var LoginFlow = class {
     if (!identity.unionId) {
       return { ok: false, reason: "union_id missing from TTC user_info" };
     }
+    let loginPass;
     try {
-      await this.deps.upsertBinding({
+      ;
+      ({ loginPass } = await this.deps.upsertBinding({
         deviceId: this.deps.getDeviceId(),
         ttcToken: params.token,
         identity
-      });
+      }));
     } catch (err) {
       return {
         ok: false,
         reason: `device_binding upsert failed: ${err.message}`
       };
     }
-    const expiresAtNum = params.expiresAt ? Number.parseInt(params.expiresAt, 10) : NaN;
     this.deps.store.write({
       identity,
-      ttcToken: params.token,
-      ttcTokenExpiresAt: Number.isFinite(expiresAtNum) ? expiresAtNum : null,
+      loginPass,
       loginAt: new Date(now).toISOString()
     });
     return { ok: true, identity };
@@ -24562,8 +24562,7 @@ var LoginFlow = class {
 function parseLoginCallbackQuery(url) {
   return {
     token: url.searchParams.get("token") ?? "",
-    state: url.searchParams.get("state") ?? "",
-    expiresAt: url.searchParams.get("expires_at")
+    state: url.searchParams.get("state") ?? ""
   };
 }
 function escapeHtml(s) {
@@ -24606,7 +24605,7 @@ var OwnerIdentityStore = class {
       return null;
     }
     const r = parsed;
-    if (!r.identity || typeof r.identity.ownerId !== "string" || r.identity.ownerId.length === 0 || typeof r.identity.provider !== "string" || r.identity.provider.length === 0 || typeof r.identity.displayName !== "string" || r.identity.displayName.length === 0 || typeof r.ttcToken !== "string" || r.ttcToken.length === 0) {
+    if (!r.identity || typeof r.identity.ownerId !== "string" || r.identity.ownerId.length === 0 || typeof r.identity.provider !== "string" || r.identity.provider.length === 0 || typeof r.identity.displayName !== "string" || r.identity.displayName.length === 0 || typeof r.loginPass !== "string" || r.loginPass.length === 0) {
       return null;
     }
     return {
@@ -24617,8 +24616,7 @@ var OwnerIdentityStore = class {
         ...typeof r.identity.avatarUrl === "string" ? { avatarUrl: r.identity.avatarUrl } : {},
         ...typeof r.identity.unionId === "string" ? { unionId: r.identity.unionId } : {}
       },
-      ttcToken: r.ttcToken,
-      ttcTokenExpiresAt: typeof r.ttcTokenExpiresAt === "number" ? r.ttcTokenExpiresAt : null,
+      loginPass: r.loginPass,
       loginAt: typeof r.loginAt === "string" ? r.loginAt : (/* @__PURE__ */ new Date(0)).toISOString()
     };
   }
@@ -24734,6 +24732,15 @@ async function upsertDeviceBinding(opts) {
     }
     throw new DeviceBindingClientError("API_ERROR", `HTTP ${res.status}: ${detail}`);
   }
+  let body = {};
+  try {
+    body = await res.json();
+  } catch {
+  }
+  if (typeof body.loginPass !== "string" || body.loginPass.length === 0) {
+    throw new DeviceBindingClientError("BAD_RESPONSE", "center did not issue a login pass (api too old?)");
+  }
+  return { loginPass: body.loginPass };
 }
 
 // src/codex-plugin/login.ts
@@ -24879,9 +24886,9 @@ async function runCodexPluginShare(filePath, deps = {}) {
   for (const f of files) form.append("file", new Blob([import_node_fs4.default.readFileSync(f.abs)]), f.relPath);
   let res;
   try {
-    res = await fetchImpl(`${clawosApi}/api/shares?provider=${encodeURIComponent(record2.identity.provider)}`, {
+    res = await fetchImpl(`${clawosApi}/api/shares`, {
       method: "POST",
-      headers: { authorization: `Bearer ${record2.ttcToken}` },
+      headers: { authorization: `Bearer ${record2.loginPass}` },
       body: form
     });
   } catch (err) {
@@ -24907,6 +24914,14 @@ async function runCodexPluginShare(filePath, deps = {}) {
 }
 
 // src/codex-plugin/mcp-server.ts
+var DEV_VERSION = "0.0.0-dev";
+function pluginVersion() {
+  try {
+    return JSON.parse(import_node_fs5.default.readFileSync(import_node_path6.default.join(__dirname, ".codex-plugin", "plugin.json"), "utf8")).version;
+  } catch {
+    return DEV_VERSION;
+  }
+}
 async function handleLoginCall(deps = {}) {
   const r = await (deps.run ?? runCodexPluginLogin)();
   switch (r.status) {
@@ -24938,7 +24953,7 @@ async function handleShareCall(filePath, deps = {}) {
   }
 }
 function createCodexPluginServer(deps = {}) {
-  const server = new McpServer({ name: "clawd", version: "0.1.2" });
+  const server = new McpServer({ name: "clawd", version: pluginVersion() });
   server.registerTool(
     "login",
     {
@@ -24955,7 +24970,7 @@ function createCodexPluginServer(deps = {}) {
       description: 'Upload a local file or folder and get a URL that requires Feishu (TTC) login to open: anyone in the company who logs in can view it, permanent. A folder is served as a static site (index.html is the home page; otherwise a file listing); .md renders as a page. Before calling, tell the user this in one sentence and make sure the content is not sensitive (passwords, keys, contracts, personal data). Files that look like credentials are refused; folders skip dot-files and node_modules. path must be absolute. Returns { status: "login_required" } when not logged in \u2014 call login, then call this again. Warning to relay to the user after success: ' + SHARE_WARNING,
       inputSchema: { path: external_exports.string().describe("absolute path of the file or folder") }
     },
-    async ({ path: path6 }) => handleShareCall(path6, deps)
+    async ({ path: path7 }) => handleShareCall(path7, deps)
   );
   return server;
 }
@@ -24972,7 +24987,9 @@ if (isMainModule) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  DEV_VERSION,
   createCodexPluginServer,
   handleLoginCall,
-  handleShareCall
+  handleShareCall,
+  pluginVersion
 });
